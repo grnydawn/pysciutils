@@ -1,2 +1,4 @@
-# pysciutils
+pysciutils
+===============
+
 Useful Python scientific utilities
