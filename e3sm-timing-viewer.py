@@ -83,7 +83,7 @@ tr:hover td { background-color: #edf8b1; }
 <script src="https://d3js.org/d3.v3.js"></script>
 <script>
 
-var column_names = ["Id", "Name","Processes","Threads","Count", "Walltime-total", \
+var column_names = ["Row-id", "Name","Processes","Threads","Count", "Walltime-total", \
                     "Walltime-max", "Walltime-min"];
 var clicks = {rowid:0, name: 0, processes: 0, threads: 0, count: 0, walltotal: 0,
               wallmax: 0, wallmin: 0};
@@ -212,7 +212,7 @@ data = JSON.parse(jsondata);
   /**  sort functionality **/
   headers
     .on("click", function(d) {
-      if (d == "Id") {
+      if (d == "Row-id") {
 	clicks.rowid++;
         // even number of clicks
         if (clicks.rowid % 2 == 0) {
