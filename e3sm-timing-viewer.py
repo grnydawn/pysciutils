@@ -6,7 +6,7 @@ import tempfile
 import shlex
 import argparse
 
-### source : http://bl.ocks.org/dhoboy/1ac430a7ca883e7a8c09
+### D3 source : http://bl.ocks.org/dhoboy/1ac430a7ca883e7a8c09
 
 html = """
 <!DOCTYPE html>
@@ -121,19 +121,18 @@ var headers = table.select("tr").selectAll("th")
     .append("th")
     .text(function(d) { return d; });
 
-var rows, row_entries, row_entries_no_anchor, row_entries_with_anchor;
+var rows, row_entries;
 
 var jsondata = '[JSONDATA]';
 
 data = JSON.parse(jsondata);
-//d3.json("data.json", function(data) { // loading data from server
   
   // draw table body with rows
   table.append("tbody")
 
   // data bind
   rows = table.select("tbody").selectAll("tr")
-    .data(data, function(d){ return d.id; });
+    .data(data, function(d){ return d.rowid; });
   
   // enter the rows
   rows.enter()
@@ -149,28 +148,12 @@ data = JSON.parse(jsondata);
           }
         }
         return [arr[0],arr[1],arr[2],arr[3],arr[4],arr[5],arr[6],arr[7]];
-        //return [arr[6],arr[5],arr[4],arr[3],arr[1],arr[2],arr[0]];
       })
     .enter()
       .append("td") 
 
-  // draw row entries with no anchor 
-  row_entries_no_anchor = row_entries.filter(function(d) {
-    return (/https?:\/\//.test(d) == false)
-  })
-  row_entries_no_anchor.text(function(d) { return d; })
+  row_entries.text(function(d) { return d; })
 
-  // draw row entries with anchor
-  row_entries_with_anchor = row_entries.filter(function(d) {
-    return (/https?:\/\//.test(d) == true)  
-  })
-  row_entries_with_anchor
-    .append("a")
-    .attr("href", function(d) { return d; })
-    .attr("target", "_blank")
-  .text(function(d) { return d; })
-    
-    
   /**  search functionality **/
     d3.select("#search")
       .on("keyup", function() { // filter according to key pressed 
@@ -184,7 +167,7 @@ data = JSON.parse(jsondata);
           } 
         })
 	    
-	    // filter blank entries from searchResults
+	// filter blank entries from searchResults
         searchResults = searchResults.filter(function(r){ 
           return r != undefined;
         })
@@ -197,11 +180,11 @@ data = JSON.parse(jsondata);
         })
 
         // flatten array 
-		searched_data = [].concat.apply([], searched_data)
+	searched_data = [].concat.apply([], searched_data)
         
         // data bind with new data
-		rows = table.select("tbody").selectAll("tr")
-		  .data(searched_data, function(d){ return d.id; })
+	rows = table.select("tbody").selectAll("tr")
+		  .data(searched_data, function(d){ return d.rowid; })
 		
         // enter the rows
         rows.enter()
@@ -216,44 +199,28 @@ data = JSON.parse(jsondata);
 		          arr.push(d[k]);
                 }
               }
-              //return [arr[6],arr[5],arr[4],arr[3],arr[1],arr[2],arr[0]];
               return [arr[0],arr[1],arr[2],arr[3],arr[4],arr[5],arr[6],arr[7]];
             })
           .enter()
             .append("td") 
 
-        // draw row entries with no anchor 
-        row_entries_no_anchor = row_entries.filter(function(d) {
-          return (/https?:\/\//.test(d) == false)
-        })
-        row_entries_no_anchor.text(function(d) { return d; })
-
-        // draw row entries with anchor
-        row_entries_with_anchor = row_entries.filter(function(d) {
-          return (/https?:\/\//.test(d) == true)  
-        })
-        row_entries_with_anchor
-          .append("a")
-          .attr("href", function(d) { return d; })
-          .attr("target", "_blank")
-        .text(function(d) { return d; })
-        
+        row_entries.text(function(d) { return d; })
         // exit
         rows.exit().remove();
       })
-    
+
   /**  sort functionality **/
   headers
     .on("click", function(d) {
       if (d == "Id") {
-        clicks.rowid++;
+	clicks.rowid++;
         // even number of clicks
         if (clicks.rowid % 2 == 0) {
-          // sort ascending: alphabetically
+          // sort ascending: numerically
           rows.sort(function(a,b) { 
-            if (a.rowid.toUpperCase() < b.rowid.toUpperCase()) { 
+            if (+a.rowid < +b.rowid) { 
               return -1; 
-            } else if (a.rowid.toUpperCase() > b.rowid.toUpperCase()) { 
+            } else if (+a.rowid > +b.rowid) { 
               return 1; 
             } else {
               return 0;
@@ -261,11 +228,11 @@ data = JSON.parse(jsondata);
           });
         // odd number of clicks  
         } else if (clicks.rowid % 2 != 0) { 
-          // sort descending: alphabetically
+          // sort descending: numerically
           rows.sort(function(a,b) { 
-            if (a.rowid.toUpperCase() < b.rowid.toUpperCase()) { 
+            if (+a.rowid < +b.rowid) { 
               return 1; 
-            } else if (a.rowid.toUpperCase() > b.rowid.toUpperCase()) { 
+            } else if (+a.rowid > +b.rowid) { 
               return -1; 
             } else {
               return 0;
@@ -497,7 +464,7 @@ def main():
     data = ""
 
     for i0, r in enumerate(rawdata):
-        ldata = ['"id":%d' % i0]
+        ldata = ['"rowid":%d' % i0]
         for i1, h in enumerate(hdr):
             v = '"%s"' % r[i1] if h=="name" else r[i1]
             ldata.append('"%s":%s'% (h, v))
@@ -517,5 +484,3 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
-
-
