@@ -504,7 +504,6 @@ def main():
     data = data[:-1]
         #data.append("{" + ",".join(ldata) + "}")
 
-    import pdb; pdb.set_trace()
     with tempfile.NamedTemporaryFile('w',
             delete=False, suffix='.html') as fh:
         #fh.write(html.replace("JSONDATA", ",".join(data)))
