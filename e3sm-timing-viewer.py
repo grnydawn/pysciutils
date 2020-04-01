@@ -4,6 +4,7 @@ import sys
 import webbrowser
 import tempfile
 import shlex
+import argparse
 
 ### source : http://bl.ocks.org/dhoboy/1ac430a7ca883e7a8c09
 
@@ -475,16 +476,17 @@ d3.select(self.frameElement).style("height", "780px").style("width", "1150px");
 
 def main():
 
-    ret = -1
+    parser = argparse.ArgumentParser(description='E3SM Timing Data Viewer.')
+    parser.add_argument('timingfile', help='path to timing data file')
+
+    args = parser.parse_args()
 
     # read timing data
-    hdr = ("name", "processes", "threads", "count", "walltotal", "wallmax",
-              "wallmin")
+    hdr = ("name", "processes", "threads", "count", "walltotal",
+            "wallmax", "wallmin")
     rawdata = []
 
-    timingfile = "res/ocnt.txt"
-
-    with open(timingfile) as ft:
+    with open(args.timingfile) as ft:
         for line in ft:
             line = line.strip()
             if line and line[0] == '"' and line[-1] == ")":
@@ -502,18 +504,16 @@ def main():
 
         data += "{" + ",".join(ldata) + "},"
     data = data[:-1]
-        #data.append("{" + ",".join(ldata) + "}")
 
     with tempfile.NamedTemporaryFile('w',
             delete=False, suffix='.html') as fh:
-        #fh.write(html.replace("JSONDATA", ",".join(data)))
         fh.write(html.replace("JSONDATA", data))
 
     # invoke it
     webbrowser.open("file://" + fh.name)
 
     # return
-    return ret
+    return 0
 
 if __name__ == "__main__":
     sys.exit(main())
